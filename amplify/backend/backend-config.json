@@ -1,0 +1,11 @@
+{
+  "auth": {
+    "taskmanagerapp1167d772": {
+      "service": "Cognito",
+      "serviceType": "imported",
+      "providerPlugin": "awscloudformation",
+      "dependsOn": [],
+      "customAuth": false
+    }
+  }
+}
