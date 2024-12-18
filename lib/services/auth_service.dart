@@ -5,13 +5,13 @@ class AuthService {
   Future<String?> signUp(String username, String email, String password) async {
     try {
       SignUpResult result = await Amplify.Auth.signUp(
-        username: username,
+        username: username.trim(),
         password: password,
         options: SignUpOptions(userAttributes: {
-          AuthUserAttributeKey.email: email,
+          AuthUserAttributeKey.email: email.trim(),
         }),
       );
-      return result.isSignUpComplete ? null : 'Verification required';
+      return null;
     } on AuthException catch (e) {
       return e.message;
     }
@@ -50,6 +50,16 @@ class AuthService {
       return null;
     } on AuthException catch (e) {
       return e.message;
+    }
+  }
+
+  // Resend Confirmation Code
+  Future<String?> resendConfirmationCode(String username) async {
+    try {
+      await Amplify.Auth.resendSignUpCode(username: username);
+      return null; // Success
+    } on AuthException catch (e) {
+      return e.message; // Return error message on failure
     }
   }
 }

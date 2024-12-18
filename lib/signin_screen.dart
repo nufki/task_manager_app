@@ -1,61 +1,88 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:task_manager_app/home_screen.dart';
 
 import '../services/auth_service.dart';
+import 'confirm_signup_screen.dart';
 import 'signup_screen.dart';
 
 class SignInScreen extends StatefulWidget {
-  final VoidCallback onSignedIn;
-  final VoidCallback onSignedOut;
-
-  SignInScreen({required this.onSignedIn, required this.onSignedOut});
+  const SignInScreen({super.key});
 
   @override
-  _SignInScreenState createState() => _SignInScreenState();
+  State<SignInScreen> createState() => _SignInScreenState();
 }
 
 class _SignInScreenState extends State<SignInScreen> {
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
-  final _authService = AuthService();
 
-  void _signIn() async {
+  void signIn() async {
     final username = _usernameController.text;
     final password = _passwordController.text;
+    final authService = Provider.of<AuthService>(context, listen: false);
 
-    final error = await _authService.signIn(username, password);
+    final error = await authService.signIn(username, password);
+
+    if (!mounted) return;
+
     if (error == null) {
-      widget.onSignedIn();
+      // Sign-in successful, navigate to HomeScreen
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (_) => HomeScreen(),
+        ),
+      );
     } else {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(error)));
+      // Display error message if sign-in fails
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error during sign-in: $error')),
+      );
+      print('error: $error');
+      if (error == 'Sign-in incomplete') {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => ConfirmSignUpScreen(username: username),
+          ),
+        );
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Sign In')),
+      appBar: AppBar(
+        title: Text(
+          'Sign-in',
+          style: TextStyle(color: Colors.white),
+        ),
+        backgroundColor: Colors.deepPurpleAccent,
+      ),
       body: Padding(
         padding: EdgeInsets.all(16),
         child: Column(
           children: [
             TextField(
-                controller: _usernameController,
-                decoration: InputDecoration(labelText: 'Username')),
+              controller: _usernameController,
+              decoration: InputDecoration(labelText: 'Username'),
+            ),
             TextField(
-                controller: _passwordController,
-                decoration: InputDecoration(labelText: 'Password'),
-                obscureText: true),
+              controller: _passwordController,
+              decoration: InputDecoration(labelText: 'Password'),
+              obscureText: true,
+            ),
             SizedBox(height: 20),
-            ElevatedButton(onPressed: _signIn, child: Text('Sign In')),
+            ElevatedButton(
+              onPressed: signIn,
+              child: Text('Sign In'),
+            ),
             TextButton(
               onPressed: () => Navigator.push(
                 context,
-                MaterialPageRoute(
-                  builder: (_) => SignUpScreen(
-                      onSignedIn: widget.onSignedIn,
-                      onSignedOut: widget.onSignedOut),
-                ),
+                MaterialPageRoute(builder: (_) => SignUpScreen()),
               ),
               child: Text('Don\'t have an account? Sign Up'),
             ),

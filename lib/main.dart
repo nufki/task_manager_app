@@ -1,6 +1,8 @@
 import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:task_manager_app/services/auth_service.dart';
 import 'package:task_manager_app/signin_screen.dart';
 
 import 'amplifyconfiguration2.dart';
@@ -9,7 +11,12 @@ import 'home_screen.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await _configureAmplify();
-  runApp(const TaskManagerApp());
+  runApp(
+    Provider<AuthService>(
+      create: (_) => AuthService(),
+      child: TaskManagerApp(),
+    ),
+  );
 }
 
 Future<void> _configureAmplify() async {
@@ -47,14 +54,7 @@ class _TaskManagerAppState extends State<TaskManagerApp> {
           ),
           backgroundColor: Colors.deepPurpleAccent,
         ),
-        body: _isSignedIn
-            ? HomeScreen(
-                onSignedOut: _onSignedOut,
-              )
-            : SignInScreen(
-                onSignedIn: _onSignedIn,
-                onSignedOut: _onSignedOut,
-              ),
+        body: _isSignedIn ? HomeScreen() : SignInScreen(),
       ),
     );
   }
@@ -76,18 +76,6 @@ class _TaskManagerAppState extends State<TaskManagerApp> {
         _isSignedIn = false;
       });
     }
-  }
-
-  void _onSignedIn() {
-    setState(() {
-      _isSignedIn = true;
-    });
-  }
-
-  void _onSignedOut() {
-    setState(() {
-      _isSignedIn = false;
-    });
   }
 }
 

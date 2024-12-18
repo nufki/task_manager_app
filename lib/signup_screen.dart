@@ -1,18 +1,12 @@
-import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:task_manager_app/services/auth_service.dart';
 
 import 'confirm_signup_screen.dart';
 
 class SignUpScreen extends StatefulWidget {
-  final VoidCallback onSignedIn;
-  final VoidCallback onSignedOut;
-
-  const SignUpScreen({
-    super.key,
-    required this.onSignedIn,
-    required this.onSignedOut,
-  });
+  const SignUpScreen({super.key});
 
   @override
   State<SignUpScreen> createState() => _SignUpScreenState();
@@ -97,7 +91,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
             ),
             SizedBox(height: 20),
             ElevatedButton(
-              onPressed: (_passwordsMatch && _isEmailValid) ? _signUp : null,
+              onPressed: (_passwordsMatch && _isEmailValid) ? signUp : null,
               child: Text('Sign Up'),
             ),
           ],
@@ -113,44 +107,49 @@ class _SignUpScreenState extends State<SignUpScreen> {
     });
   }
 
-  void _signUp() async {
-    if (_passwordController.text != _confirmPasswordController.text) {
+  void signUp() async {
+    final username = _usernameController.text.trim();
+    final email = _emailController.text.trim();
+    final password = _passwordController.text;
+    final confirmPassword = _confirmPasswordController.text;
+    final authService = Provider.of<AuthService>(context, listen: false);
+
+    // Check if passwords match
+    if (password != confirmPassword) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Passwords do not match')),
       );
       return;
     }
 
-    if (!EmailValidator.validate(_emailController.text)) {
+    // Validate email
+    if (!EmailValidator.validate(email)) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Please enter a valid email address')),
       );
       return;
     }
 
-    try {
-      await Amplify.Auth.signUp(
-        username: _usernameController.text.trim(),
-        password: _passwordController.text,
-        options: SignUpOptions(userAttributes: {
-          AuthUserAttributeKey.email: _emailController.text.trim(),
-        }),
-      );
+    // Attempt sign-up using AuthService
+    final error = await authService.signUp(username, email, password);
 
+    if (!mounted) return;
+
+    if (error == null) {
+      // Sign-up successful, prompt for confirmation
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
             content: Text('Sign up successful! Please confirm your account.')),
       );
 
+      // Navigate to the ConfirmSignUpScreen
       Navigator.of(context).push(MaterialPageRoute(
-        builder: (context) => ConfirmSignUpScreen(
-          username: _usernameController.text,
-          onSignedOut: widget.onSignedOut,
-        ),
+        builder: (context) => ConfirmSignUpScreen(username: username),
       ));
-    } catch (e) {
+    } else {
+      // Sign-up failed, display the error message
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Sign up failed: ${e.toString()}')),
+        SnackBar(content: Text('Sign up failed: $error')),
       );
     }
   }
