@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:task_manager_app/home_screen.dart';
+import 'package:task_manager_app/screens/home_screen.dart';
 import 'package:task_manager_app/services/auth_service.dart';
 
 class ConfirmSignUpScreen extends StatefulWidget {
@@ -17,6 +17,39 @@ class ConfirmSignUpScreen extends StatefulWidget {
 
 class _ConfirmSignUpScreenState extends State<ConfirmSignUpScreen> {
   final _confirmationCodeController = TextEditingController();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          'Confirm sign-up',
+          style: TextStyle(color: Colors.white),
+        ),
+        backgroundColor: Colors.deepPurpleAccent,
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            TextField(
+              controller: _confirmationCodeController,
+              decoration: InputDecoration(labelText: 'Confirmation code'),
+            ),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: confirmSignUp,
+              child: Text('Confirm'),
+            ),
+            TextButton(
+              onPressed: resendCode,
+              child: Text('Resend confirmation code'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
   void confirmSignUp() async {
     final authService = Provider.of<AuthService>(context, listen: false);
@@ -51,15 +84,14 @@ class _ConfirmSignUpScreenState extends State<ConfirmSignUpScreen> {
 
   void resendCode() async {
     final authService = Provider.of<AuthService>(context, listen: false);
-
-    final error = await authService.resendConfirmationCode(widget.username);
+    final error = await authService.resendSignupCode(widget.username);
 
     if (!mounted) return;
 
     if (error == null) {
       // Resend successful
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Confirmation code resent successfully!')),
+        SnackBar(content: Text('Confirmation code successfully re-sent!')),
       );
     } else {
       // Handle error during resend
@@ -67,38 +99,5 @@ class _ConfirmSignUpScreenState extends State<ConfirmSignUpScreen> {
         SnackBar(content: Text('Error resending code: $error')),
       );
     }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'Confirm Sign Up',
-          style: TextStyle(color: Colors.white),
-        ),
-        backgroundColor: Colors.deepPurpleAccent,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            TextField(
-              controller: _confirmationCodeController,
-              decoration: InputDecoration(labelText: 'Confirmation Code'),
-            ),
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: confirmSignUp,
-              child: Text('Confirm'),
-            ),
-            TextButton(
-              onPressed: resendCode,
-              child: Text('Resend Confirmation Code'),
-            ),
-          ],
-        ),
-      ),
-    );
   }
 }

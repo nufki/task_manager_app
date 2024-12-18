@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:task_manager_app/signin_screen.dart';
+import 'package:task_manager_app/auth/signin_screen.dart';
+import 'package:task_manager_app/screens/task_manager_screen.dart';
 
-import '../services/auth_service.dart';
+import '../../services/auth_service.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -32,25 +33,22 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'Home',
-          style: TextStyle(color: Colors.white),
-        ),
-        actions: [
-          IconButton(
-            icon: Icon(
-              Icons.logout,
-            ),
-            onPressed: () => signOut(context),
-            color: Colors.white,
+        appBar: AppBar(
+          title: Text(
+            'Home',
+            style: TextStyle(color: Colors.white),
           ),
-        ],
-        backgroundColor: Colors.deepPurpleAccent,
-      ),
-      body: Center(
-        child: Text('Welcome to the Home Screen!'),
-      ),
-    );
+          actions: [
+            IconButton(
+              icon: Icon(
+                Icons.logout,
+              ),
+              onPressed: () => signOut(context),
+              color: Colors.white,
+            ),
+          ],
+          backgroundColor: Colors.deepPurpleAccent,
+        ),
+        body: TaskManagerScreen());
   }
 }

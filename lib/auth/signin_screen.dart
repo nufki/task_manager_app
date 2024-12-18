@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:task_manager_app/home_screen.dart';
+import 'package:task_manager_app/screens/home_screen.dart';
 
-import '../services/auth_service.dart';
+import '../../services/auth_service.dart';
 import 'confirm_signup_screen.dart';
+import 'forgot_password.dart';
 import 'signup_screen.dart';
 
 class SignInScreen extends StatefulWidget {
@@ -16,6 +17,54 @@ class SignInScreen extends StatefulWidget {
 class _SignInScreenState extends State<SignInScreen> {
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          'Sign-in',
+          style: TextStyle(color: Colors.white),
+        ),
+        backgroundColor: Colors.deepPurpleAccent,
+      ),
+      body: Padding(
+        padding: EdgeInsets.all(16),
+        child: Column(
+          children: [
+            TextField(
+              controller: _usernameController,
+              decoration: InputDecoration(labelText: 'Username'),
+            ),
+            TextField(
+              controller: _passwordController,
+              decoration: InputDecoration(labelText: 'Password'),
+              obscureText: true,
+            ),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: signIn,
+              child: Text('Sign-in'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => SignUpScreen()),
+              ),
+              child: Text('Don\'t have an account? Sign-up'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => ForgotPasswordScreen()),
+              ),
+              child: Text('Reset password'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
   void signIn() async {
     final username = _usernameController.text;
@@ -49,46 +98,5 @@ class _SignInScreenState extends State<SignInScreen> {
         );
       }
     }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'Sign-in',
-          style: TextStyle(color: Colors.white),
-        ),
-        backgroundColor: Colors.deepPurpleAccent,
-      ),
-      body: Padding(
-        padding: EdgeInsets.all(16),
-        child: Column(
-          children: [
-            TextField(
-              controller: _usernameController,
-              decoration: InputDecoration(labelText: 'Username'),
-            ),
-            TextField(
-              controller: _passwordController,
-              decoration: InputDecoration(labelText: 'Password'),
-              obscureText: true,
-            ),
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: signIn,
-              child: Text('Sign In'),
-            ),
-            TextButton(
-              onPressed: () => Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => SignUpScreen()),
-              ),
-              child: Text('Don\'t have an account? Sign Up'),
-            ),
-          ],
-        ),
-      ),
-    );
   }
 }
