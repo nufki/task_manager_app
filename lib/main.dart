@@ -1,15 +1,34 @@
 import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:flutter/material.dart';
-import 'package:task_manager_app/signin_screen.dart';
+import 'package:provider/provider.dart';
+import 'package:task_manager_app/auth/signin_screen.dart';
+import 'package:task_manager_app/providers/task_provider.dart';
+import 'package:task_manager_app/providers/user_provider.dart';
+import 'package:task_manager_app/services/auth_service.dart';
 
-import 'amplifyconfiguration2.dart';
-import 'home_screen.dart';
+import 'config/amplifyconfiguration.dart';
+import 'screens/home_screen.dart';
 
-Future<void> main() async {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await _configureAmplify();
-  runApp(const TaskManagerApp());
+  runApp(
+    MultiProvider(
+      providers: [
+        Provider<AuthService>(create: (_) => AuthService()),
+        ChangeNotifierProvider<TaskProvider>(
+          create: (context) =>
+              TaskProvider(Provider.of<AuthService>(context, listen: false)),
+        ),
+        ChangeNotifierProvider<UserProvider>(
+          create: (context) =>
+              UserProvider(Provider.of<AuthService>(context, listen: false)),
+        ),
+      ],
+      child: const TaskManagerApp(),
+    ),
+  );
 }
 
 Future<void> _configureAmplify() async {
@@ -19,7 +38,7 @@ Future<void> _configureAmplify() async {
     await Amplify.configure(amplifyconfig);
     safePrint('Successfully configured Amplify');
   } on AmplifyAlreadyConfiguredException {
-    safePrint('Amplify was already configured. Skipping configuration.');
+    safePrint('Amplify was already configured. Skipping config.');
   } catch (e) {
     safePrint('Error configuring Amplify: $e');
   }
@@ -39,22 +58,23 @@ class _TaskManagerAppState extends State<TaskManagerApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Task Manager App',
+      // theme: ThemeData(
+      //   primaryColor: Color(0xffd1c4e9), // Deep Purple
+      //   hintColor: Color(0xFF00BCD4), // Cyan
+      //   buttonTheme: ButtonThemeData(
+      //     buttonColor: Color(0xffd1c4e9), // Deep Purple for buttons
+      //   ),
+      //   appBarTheme: AppBarTheme(
+      //     color: Color(0xffd1c4e9), // Deep Purple for AppBar
+      //   ),
+      //   scaffoldBackgroundColor: Colors.white,
+      //   textTheme: TextTheme(
+      //     bodyLarge: TextStyle(color: Color(0xFF00BCD4)), // Cyan text
+      //   ),
+      //   // Add more customizations if necessary
+      // ),
       home: Scaffold(
-        appBar: AppBar(
-          title: Text(
-            'Task Manager App',
-            style: TextStyle(color: Colors.white),
-          ),
-          backgroundColor: Colors.deepPurpleAccent,
-        ),
-        body: _isSignedIn
-            ? HomeScreen(
-                onSignedOut: _onSignedOut,
-              )
-            : SignInScreen(
-                onSignedIn: _onSignedIn,
-                onSignedOut: _onSignedOut,
-              ),
+        body: _isSignedIn ? HomeScreen() : SignInScreen(),
       ),
     );
   }
@@ -77,50 +97,4 @@ class _TaskManagerAppState extends State<TaskManagerApp> {
       });
     }
   }
-
-  void _onSignedIn() {
-    setState(() {
-      _isSignedIn = true;
-    });
-  }
-
-  void _onSignedOut() {
-    setState(() {
-      _isSignedIn = false;
-    });
-  }
 }
-
-/* the shit below does not work for me
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Authenticator(
-      signUpForm: SignUpForm.custom(
-        fields: [
-          SignUpFormField.email(),
-          SignUpFormField.username(),
-          SignUpFormField.password(),
-          SignUpFormField.passwordConfirmation(),
-        ],
-      ),
-      child: MaterialApp(
-        builder: Authenticator.builder(),
-        home: const Scaffold(
-          body: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                SignOutButton(),
-                Text('TODO Application'),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-*/
