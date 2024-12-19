@@ -5,18 +5,19 @@ import '../services/auth_service.dart';
 import '../services/task_service.dart';
 
 class TaskProvider with ChangeNotifier {
-  final TaskService _taskService;
+  late final TaskService _taskService;
   final AuthService _authService;
-
-  TaskProvider(this._authService) : _taskService = TaskService(_authService);
-
   List<Task> _tasks = [];
   bool _loading = false;
   SortingType _sortingType = SortingType.dueDate;
+  SortingType get sortingType => _sortingType;
 
   List<Task> get tasks => _tasks;
   bool get loading => _loading;
-  SortingType get sortingType => _sortingType;
+
+  TaskProvider(this._authService) {
+    _taskService = TaskService(_authService);
+  }
 
   Future<void> loadTasks() async {
     _loading = true;
@@ -25,7 +26,7 @@ class TaskProvider with ChangeNotifier {
     try {
       _tasks = await _taskService.fetchAllTasks();
     } catch (error) {
-      print('Error fetching tasks: $error');
+      // @Todo
     } finally {
       _loading = false;
       notifyListeners();

@@ -35,7 +35,7 @@ class HomeScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Home',
+          'Task manager',
           style: TextStyle(color: Colors.white),
         ),
         actions: [

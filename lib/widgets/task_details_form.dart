@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../models/task.dart';
 import '../providers/task_provider.dart';
+import '../providers/user_provider.dart';
 
 class TaskDetailsForm extends StatefulWidget {
   final Task task;
@@ -19,6 +20,7 @@ class _TaskDetailsFormState extends State<TaskDetailsForm> {
   late DateTime _dueDate;
   late TaskPriority _priority;
   late TaskStatus _status;
+  String? _assignedUser; // Nullable for unassigned user
 
   @override
   void initState() {
@@ -29,10 +31,31 @@ class _TaskDetailsFormState extends State<TaskDetailsForm> {
     _dueDate = widget.task.dueDate;
     _priority = widget.task.priority;
     _status = widget.task.status;
+    _assignedUser = widget.task.assignedUser; // Set the initial assigned user
+    // Fetch users after the first frame
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final userProvider = Provider.of<UserProvider>(context, listen: false);
+      if (userProvider.users.isEmpty) {
+        userProvider.loadUsers();
+      }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+    final userProvider = Provider.of<UserProvider>(context);
+
+    // Check if users are loaded
+    if (userProvider.loading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    // Ensure _assignedUser is valid
+    if (_assignedUser != null && !userProvider.users.contains(_assignedUser)) {
+      _assignedUser =
+          null; // Reset to unassigned if the current value is invalid
+    }
+
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Form(
@@ -85,6 +108,26 @@ class _TaskDetailsFormState extends State<TaskDetailsForm> {
                 },
               ),
               const SizedBox(height: 16),
+              DropdownButtonFormField<String?>(
+                value: _assignedUser,
+                decoration: const InputDecoration(labelText: 'Assigned User'),
+                items: [
+                  const DropdownMenuItem(
+                    value: null, // Unset user
+                    child: Text('Unassigned'),
+                  ),
+                  ...userProvider.users.map((user) {
+                    return DropdownMenuItem(
+                      value: user,
+                      child: Text(user),
+                    );
+                  }).toList(),
+                ],
+                onChanged: (value) {
+                  setState(() => _assignedUser = value);
+                },
+              ),
+              const SizedBox(height: 16),
               ListTile(
                 title: Text(
                     'Due Date: ${_dueDate.toLocal().toString().split(' ')[0]}'),
@@ -133,7 +176,7 @@ class _TaskDetailsFormState extends State<TaskDetailsForm> {
       status: _status,
       priority: _priority,
       dueDate: _dueDate,
-      assignedUser: widget.task.assignedUser, // Preserve the assigned user
+      assignedUser: _assignedUser, // Save the updated user assignment
     );
 
     Provider.of<TaskProvider>(context, listen: false).updateTask(updatedTask);

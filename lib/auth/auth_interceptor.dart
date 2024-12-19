@@ -11,8 +11,6 @@ class AuthInterceptor extends InterceptorContract {
     required BaseRequest request,
   }) async {
     final token = await authService.getToken();
-    print(token);
-
     if (token != null) {
       request.headers['Authorization'] = 'Bearer $token';
     }

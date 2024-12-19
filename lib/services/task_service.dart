@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-// import 'package:http/http.dart' as http;
 import 'package:http_interceptor/http/intercepted_http.dart';
 
 import '../auth/auth_interceptor.dart';
@@ -23,7 +22,6 @@ class TaskService {
     final response = await _http.get(Uri.parse(apiUrl));
     if (response.statusCode == 200) {
       List<dynamic> data = jsonDecode(response.body);
-      print(data);
       return data.map((item) => _mapToTask(item)).toList();
     } else {
       throw Exception('Failed to load tasks');
@@ -68,8 +66,6 @@ class TaskService {
   }
 
   Task _mapToTask(Map<String, dynamic> item) {
-    print('_mapToTask$item');
-
     return Task(
       id: item['id'],
       name: item['name'],

@@ -32,69 +32,100 @@ class _SignUpScreenState extends State<SignUpScreen> {
         ),
         backgroundColor: Colors.deepPurpleAccent,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            TextField(
-              controller: _usernameController,
-              decoration: InputDecoration(labelText: 'Username'),
-            ),
-            TextField(
-              controller: _emailController,
-              decoration: InputDecoration(
-                labelText: 'Email',
-                errorText: _isEmailValid ? null : 'Invalid email format',
-              ),
-              onChanged: (value) {
-                setState(() {
-                  _isEmailValid = EmailValidator.validate(value);
-                });
-              },
-            ),
-            TextField(
-              controller: _passwordController,
-              decoration: InputDecoration(
-                labelText: 'Password',
-                suffixIcon: IconButton(
-                  icon: Icon(_obscurePassword
-                      ? Icons.visibility_off
-                      : Icons.visibility),
-                  onPressed: () {
-                    setState(() {
-                      _obscurePassword = !_obscurePassword;
-                    });
-                  },
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+              horizontal: 16), // Left and right margins
+          child: Column(
+            mainAxisAlignment:
+                MainAxisAlignment.start, // Center the form vertically
+            children: [
+              SizedBox(height: 40), // Adjust the height for custom top margin
+              Text(
+                'Sign-up in the silly demo app :)',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
-              obscureText: _obscurePassword,
-              onChanged: checkPasswordMatch,
-            ),
-            TextField(
-              controller: _confirmPasswordController,
-              decoration: InputDecoration(
-                labelText: 'Confirm password',
-                suffixIcon: IconButton(
-                  icon: Icon(_obscureConfirmPassword
-                      ? Icons.visibility_off
-                      : Icons.visibility),
-                  onPressed: () {
-                    setState(() {
-                      _obscureConfirmPassword = !_obscureConfirmPassword;
-                    });
-                  },
+              SizedBox(height: 20), // Adjust the height for custom top margin
+              Card(
+                elevation: 4, // Adds shadow for a better visual appearance
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
                 ),
-                errorText: _passwordsMatch ? null : 'Passwords do not match',
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    children: [
+                      TextField(
+                        controller: _usernameController,
+                        decoration: InputDecoration(labelText: 'Username'),
+                      ),
+                      TextField(
+                        controller: _emailController,
+                        decoration: InputDecoration(
+                          labelText: 'Email',
+                          errorText:
+                              _isEmailValid ? null : 'Invalid email format',
+                        ),
+                        onChanged: (value) {
+                          setState(() {
+                            _isEmailValid = EmailValidator.validate(value);
+                          });
+                        },
+                      ),
+                      TextField(
+                        controller: _passwordController,
+                        decoration: InputDecoration(
+                          labelText: 'Password',
+                          suffixIcon: IconButton(
+                            icon: Icon(_obscurePassword
+                                ? Icons.visibility_off
+                                : Icons.visibility),
+                            onPressed: () {
+                              setState(() {
+                                _obscurePassword = !_obscurePassword;
+                              });
+                            },
+                          ),
+                        ),
+                        obscureText: _obscurePassword,
+                        onChanged: checkPasswordMatch,
+                      ),
+                      TextField(
+                        controller: _confirmPasswordController,
+                        decoration: InputDecoration(
+                          labelText: 'Confirm password',
+                          suffixIcon: IconButton(
+                            icon: Icon(_obscureConfirmPassword
+                                ? Icons.visibility_off
+                                : Icons.visibility),
+                            onPressed: () {
+                              setState(() {
+                                _obscureConfirmPassword =
+                                    !_obscureConfirmPassword;
+                              });
+                            },
+                          ),
+                          errorText:
+                              _passwordsMatch ? null : 'Passwords do not match',
+                        ),
+                        obscureText: _obscureConfirmPassword,
+                        onChanged: checkPasswordMatch,
+                      ),
+                      SizedBox(height: 20),
+                      ElevatedButton(
+                        onPressed:
+                            (_passwordsMatch && _isEmailValid) ? signUp : null,
+                        child: Text('Sign-up'),
+                      ),
+                    ],
+                  ),
+                ),
               ),
-              obscureText: _obscureConfirmPassword,
-              onChanged: checkPasswordMatch,
-            ),
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: (_passwordsMatch && _isEmailValid) ? signUp : null,
-              child: Text('Sign-up'),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

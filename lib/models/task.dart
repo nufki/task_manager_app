@@ -1,4 +1,4 @@
-enum TaskPriority { low, medium, high }
+enum TaskPriority { high, medium, low }
 
 enum TaskStatus { notStarted, inProgress, completed }
 
@@ -98,3 +98,16 @@ extension TaskStatusExtension on TaskStatus {
 }
 
 enum SortingType { highestPrio, status, dueDate }
+
+extension SortingTypeExtension on SortingType {
+  String get displayName {
+    switch (this) {
+      case SortingType.highestPrio:
+        return 'Highest priority';
+      case SortingType.status:
+        return 'Completion status';
+      case SortingType.dueDate:
+        return 'Due Date';
+    }
+  }
+}

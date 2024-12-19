@@ -81,9 +81,15 @@ class _AddTaskFormState extends State<AddTaskForm> {
                 onTap: _pickDueDate,
               ),
               const SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: _submitTask,
-                child: const Text('Add Task'),
+              Row(
+                mainAxisAlignment:
+                    MainAxisAlignment.end, // Align buttons to the right
+                children: [
+                  ElevatedButton(
+                    onPressed: _submitTask,
+                    child: const Text('Add task'),
+                  ),
+                ],
               ),
             ],
           ),

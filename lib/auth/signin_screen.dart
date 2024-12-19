@@ -17,50 +17,103 @@ class SignInScreen extends StatefulWidget {
 class _SignInScreenState extends State<SignInScreen> {
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
+  bool _obscurePassword = true; // To toggle password visibility
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Sign-in',
+          'Task manager',
           style: TextStyle(color: Colors.white),
         ),
         backgroundColor: Colors.deepPurpleAccent,
       ),
-      body: Padding(
-        padding: EdgeInsets.all(16),
-        child: Column(
-          children: [
-            TextField(
-              controller: _usernameController,
-              decoration: InputDecoration(labelText: 'Username'),
-            ),
-            TextField(
-              controller: _passwordController,
-              decoration: InputDecoration(labelText: 'Password'),
-              obscureText: true,
-            ),
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: signIn,
-              child: Text('Sign-in'),
-            ),
-            TextButton(
-              onPressed: () => Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => SignUpScreen()),
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+              horizontal: 16), // Left and right margins
+          child: Column(
+            mainAxisAlignment:
+                MainAxisAlignment.start, // Center the form vertically
+            children: [
+              SizedBox(height: 40), // Adjust the height for custom top margin
+              Text(
+                'Sign-in in silly demo app :)',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-              child: Text('Don\'t have an account? Sign-up'),
-            ),
-            TextButton(
-              onPressed: () => Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => ForgotPasswordScreen()),
+              SizedBox(height: 20), // Adjust the height for custom top margin
+              Card(
+                elevation: 4, // Adds shadow for a better visual appearance
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Padding(
+                  padding: EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment:
+                        CrossAxisAlignment.center, // Align text to the left
+                    children: [
+                      SizedBox(height: 16),
+                      // Username input field
+                      TextField(
+                        controller: _usernameController,
+                        decoration: InputDecoration(
+                          labelText: 'Username',
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
+                      SizedBox(height: 16),
+                      // Password input field with toggle visibility
+                      TextField(
+                        controller: _passwordController,
+                        obscureText: _obscurePassword,
+                        decoration: InputDecoration(
+                          labelText: 'Password',
+                          border: OutlineInputBorder(),
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              _obscurePassword
+                                  ? Icons.visibility
+                                  : Icons.visibility_off,
+                            ),
+                            onPressed: _togglePasswordVisibility,
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 20),
+                      // A separate Column to hold the buttons and links
+                      ElevatedButton(
+                        onPressed: signIn,
+                        child: Text('Sign In'),
+                      ),
+                      SizedBox(height: 10),
+                      // Link to sign-up screen
+                      TextButton(
+                        onPressed: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => SignUpScreen()),
+                        ),
+                        child: Text('Don’t have an account? Sign up'),
+                      ),
+                      // Link to forgot password screen
+                      TextButton(
+                        onPressed: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (_) => ForgotPasswordScreen()),
+                        ),
+                        child: Text('Forgot your password?'),
+                      ),
+                    ],
+                  ),
+                ),
               ),
-              child: Text('Reset password'),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -88,7 +141,6 @@ class _SignInScreenState extends State<SignInScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error during sign-in: $error')),
       );
-      print('error: $error');
       if (error == 'Sign-in incomplete') {
         Navigator.push(
           context,
@@ -98,5 +150,12 @@ class _SignInScreenState extends State<SignInScreen> {
         );
       }
     }
+  }
+
+  // Toggle the password visibility
+  void _togglePasswordVisibility() {
+    setState(() {
+      _obscurePassword = !_obscurePassword;
+    });
   }
 }

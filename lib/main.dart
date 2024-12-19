@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:task_manager_app/auth/signin_screen.dart';
 import 'package:task_manager_app/providers/task_provider.dart';
+import 'package:task_manager_app/providers/user_provider.dart';
 import 'package:task_manager_app/services/auth_service.dart';
 
 import 'config/amplifyconfiguration.dart';
@@ -19,6 +20,10 @@ void main() async {
         ChangeNotifierProvider<TaskProvider>(
           create: (context) =>
               TaskProvider(Provider.of<AuthService>(context, listen: false)),
+        ),
+        ChangeNotifierProvider<UserProvider>(
+          create: (context) =>
+              UserProvider(Provider.of<AuthService>(context, listen: false)),
         ),
       ],
       child: const TaskManagerApp(),
@@ -53,6 +58,21 @@ class _TaskManagerAppState extends State<TaskManagerApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Task Manager App',
+      // theme: ThemeData(
+      //   primaryColor: Color(0xffd1c4e9), // Deep Purple
+      //   hintColor: Color(0xFF00BCD4), // Cyan
+      //   buttonTheme: ButtonThemeData(
+      //     buttonColor: Color(0xffd1c4e9), // Deep Purple for buttons
+      //   ),
+      //   appBarTheme: AppBarTheme(
+      //     color: Color(0xffd1c4e9), // Deep Purple for AppBar
+      //   ),
+      //   scaffoldBackgroundColor: Colors.white,
+      //   textTheme: TextTheme(
+      //     bodyLarge: TextStyle(color: Color(0xFF00BCD4)), // Cyan text
+      //   ),
+      //   // Add more customizations if necessary
+      // ),
       home: Scaffold(
         body: _isSignedIn ? HomeScreen() : SignInScreen(),
       ),

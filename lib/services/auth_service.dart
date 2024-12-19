@@ -5,7 +5,7 @@ class AuthService {
   // Signup
   Future<String?> signUp(String username, String email, String password) async {
     try {
-      SignUpResult result = await Amplify.Auth.signUp(
+      await Amplify.Auth.signUp(
         username: username.trim(),
         password: password,
         options: SignUpOptions(userAttributes: {
