@@ -33,22 +33,23 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Text(
-            'Home',
-            style: TextStyle(color: Colors.white),
-          ),
-          actions: [
-            IconButton(
-              icon: Icon(
-                Icons.logout,
-              ),
-              onPressed: () => signOut(context),
-              color: Colors.white,
-            ),
-          ],
-          backgroundColor: Colors.deepPurpleAccent,
+      appBar: AppBar(
+        title: Text(
+          'Home',
+          style: TextStyle(color: Colors.white),
         ),
-        body: TaskManagerScreen());
+        actions: [
+          IconButton(
+            icon: Icon(
+              Icons.logout,
+            ),
+            onPressed: () => signOut(context),
+            color: Colors.white,
+          ),
+        ],
+        backgroundColor: Colors.deepPurpleAccent,
+      ),
+      body: TaskManagerScreen(),
+    );
   }
 }

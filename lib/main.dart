@@ -3,24 +3,25 @@ import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:task_manager_app/auth/signin_screen.dart';
+import 'package:task_manager_app/providers/task_provider.dart';
 import 'package:task_manager_app/services/auth_service.dart';
-import 'package:task_manager_app/services/task_service.dart';
 
 import 'config/amplifyconfiguration.dart';
 import 'screens/home_screen.dart';
 
-Future<void> main() async {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await _configureAmplify();
   runApp(
     MultiProvider(
       providers: [
         Provider<AuthService>(create: (_) => AuthService()),
-        ProxyProvider<AuthService, TaskService>(
-          update: (_, authService, __) => TaskService(authService),
+        ChangeNotifierProvider<TaskProvider>(
+          create: (context) =>
+              TaskProvider(Provider.of<AuthService>(context, listen: false)),
         ),
       ],
-      child: TaskManagerApp(),
+      child: const TaskManagerApp(),
     ),
   );
 }

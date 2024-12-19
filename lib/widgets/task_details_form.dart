@@ -4,27 +4,38 @@ import 'package:provider/provider.dart';
 import '../models/task.dart';
 import '../providers/task_provider.dart';
 
-class AddTaskForm extends StatefulWidget {
-  const AddTaskForm({super.key});
+class TaskDetailsForm extends StatefulWidget {
+  final Task task;
+
+  const TaskDetailsForm({super.key, required this.task});
 
   @override
-  State<AddTaskForm> createState() => _AddTaskFormState();
+  State<TaskDetailsForm> createState() => _TaskDetailsFormState();
 }
 
-class _AddTaskFormState extends State<AddTaskForm> {
-  final _formKey = GlobalKey<FormState>();
-  final _nameController = TextEditingController();
-  final _descriptionController = TextEditingController();
-  DateTime _dueDate = DateTime.now();
-  TaskPriority _priority = TaskPriority.medium;
-  TaskStatus _status = TaskStatus.notStarted;
+class _TaskDetailsFormState extends State<TaskDetailsForm> {
+  late TextEditingController _nameController;
+  late TextEditingController _descriptionController;
+  late DateTime _dueDate;
+  late TaskPriority _priority;
+  late TaskStatus _status;
+
+  @override
+  void initState() {
+    super.initState();
+    _nameController = TextEditingController(text: widget.task.name);
+    _descriptionController =
+        TextEditingController(text: widget.task.description);
+    _dueDate = widget.task.dueDate;
+    _priority = widget.task.priority;
+    _status = widget.task.status;
+  }
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Form(
-        key: _formKey,
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -80,10 +91,20 @@ class _AddTaskFormState extends State<AddTaskForm> {
                 trailing: const Icon(Icons.calendar_today),
                 onTap: _pickDueDate,
               ),
-              const SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: _submitTask,
-                child: const Text('Add Task'),
+              Row(
+                mainAxisAlignment:
+                    MainAxisAlignment.end, // Align buttons to the right
+                children: [
+                  ElevatedButton(
+                    onPressed: _submitTask,
+                    child: const Text('Update'),
+                  ),
+                  const SizedBox(width: 16), // Space between buttons
+                  ElevatedButton(
+                    onPressed: () => _deleteTask(context),
+                    child: const Text('Delete'),
+                  ),
+                ],
               ),
             ],
           ),
@@ -105,17 +126,23 @@ class _AddTaskFormState extends State<AddTaskForm> {
   }
 
   void _submitTask() {
-    if (_formKey.currentState!.validate()) {
-      final newTask = Task(
-        name: _nameController.text,
-        description: _descriptionController.text,
-        status: _status,
-        priority: _priority,
-        dueDate: _dueDate,
-      );
+    final updatedTask = Task(
+      id: widget.task.id,
+      name: _nameController.text,
+      description: _descriptionController.text,
+      status: _status,
+      priority: _priority,
+      dueDate: _dueDate,
+      assignedUser: widget.task.assignedUser, // Preserve the assigned user
+    );
 
-      Provider.of<TaskProvider>(context, listen: false).addTask(newTask);
-      Navigator.of(context).pop(); // Close the modal after submission
-    }
+    Provider.of<TaskProvider>(context, listen: false).updateTask(updatedTask);
+    Navigator.of(context).pop(); // Close the modal
+  }
+
+  void _deleteTask(BuildContext context) {
+    Provider.of<TaskProvider>(context, listen: false)
+        .deleteTask(widget.task.id!);
+    Navigator.of(context).pop(); // Close the modal
   }
 }

@@ -37,6 +37,16 @@ class TaskProvider with ChangeNotifier {
     await loadTasks();
   }
 
+  Future<void> updateTask(Task task) async {
+    await _taskService.updateTask(task);
+    await loadTasks(); // Refresh the tasks after update not sure if there is a smarter way in flutter that just updates the state
+  }
+
+  Future<void> deleteTask(String taskId) async {
+    await _taskService.deleteTask(taskId);
+    await loadTasks(); // Refresh the task list after deletion not sure if there is a smarter way in flutter that just updates the state
+  }
+
   void sortTasks(SortingType type) {
     _sortingType = type;
     _tasks.sort((a, b) {

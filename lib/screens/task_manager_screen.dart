@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/task_provider.dart';
+import '../widgets/add_task_form.dart';
+import '../widgets/task_list.dart';
 
 class TaskManagerScreen extends StatefulWidget {
   const TaskManagerScreen({super.key});
@@ -14,7 +16,9 @@ class _TaskManagerScreenState extends State<TaskManagerScreen> {
   @override
   void initState() {
     super.initState();
-    fetchTasks();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      fetchTasks();
+    });
   }
 
   @override
@@ -22,31 +26,39 @@ class _TaskManagerScreenState extends State<TaskManagerScreen> {
     final taskProvider = Provider.of<TaskProvider>(context);
 
     return Scaffold(
-      appBar: AppBar(title: Text('Task Manager')),
-      body: taskProvider.loading
-          ? Center(child: CircularProgressIndicator())
-          : ListView.builder(
-              itemCount: taskProvider.tasks.length,
-              itemBuilder: (context, index) {
-                final task = taskProvider.tasks[index];
-                return ListTile(
-                  title: Text(task.name),
-                  subtitle: Text(task.description),
-                );
-              },
-            ),
+      appBar: AppBar(title: const Text('Task Manager')),
+      body: RefreshIndicator(
+        onRefresh: refreshTasks, // Call the refresh function
+        child: taskProvider.loading
+            ? const Center(child: CircularProgressIndicator())
+            : const TaskList(), // Use the TaskList widget here
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => _showAddTaskForm(context),
+        tooltip: 'Add New Task',
+        child: const Icon(Icons.add),
+      ),
     );
   }
 
-  void fetchTasks() async {
-    final taskProvider = Provider.of<TaskProvider>(context, listen: false);
+  Future<void> refreshTasks() async {
+    await Provider.of<TaskProvider>(context, listen: false).loadTasks();
+  }
 
-    try {
-      await taskProvider.loadTasks();
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error fetching tasks: $e')),
-      );
-    }
+  void fetchTasks() {
+    Provider.of<TaskProvider>(context, listen: false).loadTasks();
+  }
+
+  void _showAddTaskForm(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (ctx) => Padding(
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(ctx).viewInsets.bottom,
+        ),
+        child: const AddTaskForm(),
+      ),
+    );
   }
 }
