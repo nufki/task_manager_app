@@ -39,7 +39,7 @@ class _SignInScreenState extends State<SignInScreen> {
             children: [
               SizedBox(height: 40), // Adjust the height for custom top margin
               Text(
-                'Sign-in in silly demo app :)',
+                'Sign-in in the silly demo app :)',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,

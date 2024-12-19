@@ -63,8 +63,7 @@ class _ConfirmSignUpScreenState extends State<ConfirmSignUpScreen> {
     if (error == null) {
       // Confirmation successful
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text('Account confirmed successfully! Please sign in.')),
+        SnackBar(content: Text('Account successfully confirmed!')),
       );
 
       // Navigate to the Sign-In screen
