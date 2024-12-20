@@ -28,9 +28,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       appBar: AppBar(
         title: Text(
           'Sign-up',
-          style: TextStyle(color: Colors.white),
         ),
-        backgroundColor: Colors.deepPurpleAccent,
       ),
       body: Center(
         child: Padding(

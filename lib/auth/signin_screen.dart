@@ -25,9 +25,7 @@ class _SignInScreenState extends State<SignInScreen> {
       appBar: AppBar(
         title: Text(
           'Task manager',
-          style: TextStyle(color: Colors.white),
         ),
-        backgroundColor: Colors.deepPurpleAccent,
       ),
       body: Center(
         child: Padding(

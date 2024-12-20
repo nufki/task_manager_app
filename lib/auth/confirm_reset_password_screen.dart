@@ -31,9 +31,7 @@ class _ConfirmResetPasswordScreenState
       appBar: AppBar(
         title: Text(
           'Confirm reset password',
-          style: TextStyle(color: Colors.white),
         ),
-        backgroundColor: Colors.deepPurpleAccent,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:task_manager_app/models/task.dart';
 import 'package:task_manager_app/widgets/task_details_form.dart';
+import 'package:task_manager_app/widgets/task_helpers.dart';
 
 import '../providers/task_provider.dart';
 
@@ -21,25 +22,45 @@ class TaskList extends StatelessWidget {
         final isUnassigned =
             task.assignedUser == null || task.assignedUser!.isEmpty;
 
-        Color cardColor = Colors.white;
-        if (isPastDue) {
-          cardColor = Colors.red[100]!;
-        } else if (isUnassigned) {
-          cardColor = Colors.yellow[100]!;
-        }
-
         return Card(
-          color: cardColor,
-          margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
           child: Padding(
             padding: const EdgeInsets.all(16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  task.name,
-                  style: const TextStyle(
-                      fontSize: 18, fontWeight: FontWeight.bold),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      task.name,
+                      style: const TextStyle(
+                          fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                    // 3-dot menu
+                    PopupMenuButton<String>(
+                      onSelected: (value) {
+                        if (value == 'view_details') {
+                          _showTaskDetails(context, task);
+                        }
+                        if (value == 'delete_task') {
+                          _deleteTask(context, task);
+                        }
+                      },
+                      itemBuilder: (BuildContext context) {
+                        return [
+                          const PopupMenuItem<String>(
+                            value: 'view_details',
+                            child: Text('Details'),
+                          ),
+                          const PopupMenuItem<String>(
+                            value: 'delete_task',
+                            child: Text('Delete'),
+                          ),
+                        ];
+                      },
+                      icon: const Icon(Icons.more_vert),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 8),
                 Text.rich(
@@ -95,10 +116,6 @@ class TaskList extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 12),
-                ElevatedButton(
-                  onPressed: () => _showTaskDetails(context, task),
-                  child: const Text('View Details'),
-                ),
               ],
             ),
           ),
@@ -140,5 +157,10 @@ class TaskList extends StatelessWidget {
         child: TaskDetailsForm(task: task), // Pass the task to the form
       ),
     );
+  }
+
+  void _deleteTask(BuildContext context, Task task) {
+    showDeleteConfirmationDialog(
+        context, task.id!); // Call the outsourced function
   }
 }

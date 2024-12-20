@@ -24,9 +24,7 @@ class _ConfirmSignUpScreenState extends State<ConfirmSignUpScreen> {
       appBar: AppBar(
         title: Text(
           'Confirm sign-up',
-          style: TextStyle(color: Colors.white),
         ),
-        backgroundColor: Colors.deepPurpleAccent,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),

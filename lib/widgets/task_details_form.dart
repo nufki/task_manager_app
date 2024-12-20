@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:task_manager_app/widgets/task_helpers.dart';
 
 import '../models/task.dart';
 import '../providers/task_provider.dart';
@@ -21,6 +22,7 @@ class _TaskDetailsFormState extends State<TaskDetailsForm> {
   late TaskPriority _priority;
   late TaskStatus _status;
   String? _assignedUser; // Nullable for unassigned user
+  final _formKey = GlobalKey<FormState>();
 
   @override
   void initState() {
@@ -45,11 +47,6 @@ class _TaskDetailsFormState extends State<TaskDetailsForm> {
   Widget build(BuildContext context) {
     final userProvider = Provider.of<UserProvider>(context);
 
-    // Check if users are loaded
-    if (userProvider.loading) {
-      return const Center(child: CircularProgressIndicator());
-    }
-
     // Ensure _assignedUser is valid
     if (_assignedUser != null && !userProvider.users.contains(_assignedUser)) {
       _assignedUser =
@@ -59,6 +56,7 @@ class _TaskDetailsFormState extends State<TaskDetailsForm> {
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Form(
+        key: _formKey,
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -108,9 +106,34 @@ class _TaskDetailsFormState extends State<TaskDetailsForm> {
                 },
               ),
               const SizedBox(height: 16),
+              Row(
+                children: [
+                  const Text(
+                    'Due Date',
+                    style: TextStyle(
+                      fontSize: 16,
+                    ),
+                  ),
+                  Expanded(
+                    child: Align(
+                      alignment:
+                          Alignment.centerRight, // Align date to the right
+                      child: Text(
+                        // Manually format the date (yyyy-MM-dd)
+                        '${_dueDate.year}-${_dueDate.month.toString().padLeft(2, '0')}-${_dueDate.day.toString().padLeft(2, '0')}',
+                        style: const TextStyle(fontSize: 16),
+                      ),
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.calendar_today),
+                    onPressed: _pickDueDate,
+                  ),
+                ],
+              ),
               DropdownButtonFormField<String?>(
                 value: _assignedUser,
-                decoration: const InputDecoration(labelText: 'Assigned User'),
+                decoration: const InputDecoration(labelText: 'Assigned user'),
                 items: [
                   const DropdownMenuItem(
                     value: null, // Unset user
@@ -127,25 +150,29 @@ class _TaskDetailsFormState extends State<TaskDetailsForm> {
                   setState(() => _assignedUser = value);
                 },
               ),
-              const SizedBox(height: 16),
-              ListTile(
-                title: Text(
-                    'Due Date: ${_dueDate.toLocal().toString().split(' ')[0]}'),
-                trailing: const Icon(Icons.calendar_today),
-                onTap: _pickDueDate,
-              ),
+              if (userProvider.loading)
+                const Padding(
+                  padding: EdgeInsets.only(
+                      right:
+                          8), // Add some space between the spinner and dropdown
+                  child: LinearProgressIndicator(
+                    valueColor:
+                        AlwaysStoppedAnimation<Color>(Colors.deepPurpleAccent),
+                    minHeight: 3.0, // Set the height of the progress bar
+                  ),
+                ),
               Row(
                 mainAxisAlignment:
                     MainAxisAlignment.end, // Align buttons to the right
                 children: [
                   ElevatedButton(
-                    onPressed: _submitTask,
-                    child: const Text('Update'),
+                    onPressed: () => _deleteTask(context),
+                    child: const Text('Delete'),
                   ),
                   const SizedBox(width: 16), // Space between buttons
                   ElevatedButton(
-                    onPressed: () => _deleteTask(context),
-                    child: const Text('Delete'),
+                    onPressed: _submitTask,
+                    child: const Text('Update'),
                   ),
                 ],
               ),
@@ -169,23 +196,30 @@ class _TaskDetailsFormState extends State<TaskDetailsForm> {
   }
 
   void _submitTask() {
-    final updatedTask = Task(
-      id: widget.task.id,
-      name: _nameController.text,
-      description: _descriptionController.text,
-      status: _status,
-      priority: _priority,
-      dueDate: _dueDate,
-      assignedUser: _assignedUser, // Save the updated user assignment
-    );
+    if (_formKey.currentState!.validate()) {
+      final updatedTask = Task(
+        id: widget.task.id,
+        name: _nameController.text,
+        description: _descriptionController.text,
+        status: _status,
+        priority: _priority,
+        dueDate: _dueDate,
+        assignedUser: _assignedUser, // Save the updated user assignment
+      );
 
-    Provider.of<TaskProvider>(context, listen: false).updateTask(updatedTask);
-    Navigator.of(context).pop(); // Close the modal
+      Provider.of<TaskProvider>(context, listen: false).updateTask(updatedTask);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Task successfully updated'),
+          duration: Duration(milliseconds: 500),
+        ),
+      );
+      Navigator.of(context).pop(); // Close the modal
+    }
   }
 
   void _deleteTask(BuildContext context) {
-    Provider.of<TaskProvider>(context, listen: false)
-        .deleteTask(widget.task.id!);
-    Navigator.of(context).pop(); // Close the modal
+    showDeleteConfirmationDialog(
+        context, widget.task.id!); // Call the outsourced function
   }
 }

@@ -58,6 +58,23 @@ class _TaskManagerAppState extends State<TaskManagerApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Task Manager App',
+      theme: ThemeData(
+        primarySwatch: Colors.deepPurple,
+        cardTheme: CardTheme(
+          //color: Color(0xffd1c4e9), // White cards to stand out
+          elevation: 1, // Slight shadow for depth
+          margin: EdgeInsets.symmetric(vertical: 5.0),
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(0)), // Rounded edges
+        ),
+        appBarTheme: AppBarTheme(
+            color: Colors
+                .deepPurple, // Set AppBar color to primary color (same as the primarySwatch)
+            elevation: 0, // Optional: Flat design for a cleaner look
+            iconTheme: IconThemeData(
+                color: Colors.white), // Set icons in the app bar to white
+            titleTextStyle: TextStyle(color: Colors.white, fontSize: 18)),
+      ),
       // theme: ThemeData(
       //   primaryColor: Color(0xffd1c4e9), // Deep Purple
       //   hintColor: Color(0xFF00BCD4), // Cyan

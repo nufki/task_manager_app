@@ -36,7 +36,6 @@ class HomeScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text(
           'Task manager',
-          style: TextStyle(color: Colors.white),
         ),
         actions: [
           IconButton(
@@ -44,10 +43,8 @@ class HomeScreen extends StatelessWidget {
               Icons.logout,
             ),
             onPressed: () => signOut(context),
-            color: Colors.white,
           ),
         ],
-        backgroundColor: Colors.deepPurpleAccent,
       ),
       body: TaskManagerScreen(),
     );
