@@ -1,8 +1,10 @@
 # About
-This is the corresponding flutter app of the simple task manager application backend:
-https://github.com/nufki/task-manager-backend
+This is the corresponding flutter app of the simple task manager application.
 
-I also implemented a matching Anuglar frontend (version 18.2) for this silly task :):
+Backend: https://github.com/nufki/task-manager-backend
+
+I also implemented a matching Angular frontend (version 18.2) for this silly task :):
+
 https://github.com/nufki/task-manager-frontend
 
 ## Implemented functionality
@@ -27,6 +29,7 @@ Features:
   <img src="images/update-delete-task.png" alt="Update and Delete Task" width="200" />
   <img src="images/sign-in.png" alt="Sign In" width="200" />
   <img src="images/sign-up.png" alt="Sign Up" width="200" />
+  <img src="images/task-manager-app-icon.png" alt="App Icon" width="200" />
 </div>
 
 ## Deploy the app on IOS (native device)
@@ -36,4 +39,26 @@ Features:
 flutter run --release  
 ````
 This command builds and runs your Flutter app on a connected device (physical device or emulator/simulator) in release mode.
+
+
+## Deployment commands documentation
+
+````
+flutter run --release  
+````
+- Builds the app in release mode and immediately runs it on a connected device in the specified mode (e.g., --release, --debug, --profile)
+- Quickly test your app in release mode on a real device or emulator
+- It does not generate the .ipa file for distribution
+- Does not always perform a clean build. Hence, when changing app icons, `flutter clean` has to be run first!
+
+
+````
+flutter build ios
+````
+- Builds the iOS app for release, creating an .xcarchive and/or .ipa file for deployment to the App Store or TestFlight.
+- Prepares the app for iOS deployment by running Xcode-specific build steps
+- Creates build artifacts in the build/ios directory
+- This command does not run or install the app on a device
+- Does not run a clean, If there are issues related to stale build artifacts, corrupted cache, or changes in resources 
+  (like assets, icons, or dependencies), you should manually `run flutter clean` before flutter build ios to ensure a completely fresh build 
 
