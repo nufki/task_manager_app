@@ -1,6 +1,7 @@
 import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
 import 'package:task_manager_app/auth/signin_screen.dart';
 import 'package:task_manager_app/providers/task_provider.dart';
@@ -13,6 +14,8 @@ import 'screens/home_screen.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await _configureAmplify();
+  await dotenv.load(fileName: ".env");
+
   runApp(
     MultiProvider(
       providers: [

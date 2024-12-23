@@ -1,14 +1,10 @@
-# About
-This is the corresponding flutter app of the simple task manager application.
+# Simple Task Manager - Flutter App
+This is the corresponding Flutter application for the Simple Task Manager, a project that provides functionality for
+managing task and is only meant for demo purposes. The app integrates with a backend API and has a matching Angular frontend implementation.
 
-Backend: https://github.com/nufki/task-manager-backend
-
-I also implemented a matching Angular frontend (version 18.2) for this silly task :):
-
-https://github.com/nufki/task-manager-frontend
 
 ## Implemented functionality
-Features:
+### **Features**
 - Simple app that allows to list, create, update and delete tasks
 - The app interacts with the task manager API that is deployed in the backend (which includes the infrastructure as well in AWS cdk)
 - Next to the task API, I implemented a single User API that allows to list all signed-up users (with pagination and optional username search) 
@@ -21,6 +17,12 @@ Features:
   - Reset password
   - Confirm reset password via code sent via email
 
+### **Technology Stack**
+- **Flutter**: Frontend mobile application development (this application).
+- **Backend**: [Task Manager Backend](https://github.com/nufki/task-manager-backend).
+- **Frontend (Web)**: [Angular Frontend](https://github.com/nufki/task-manager-frontend) (version 18.2).
+
+
 ## Impressions
 <div style="display: flex; justify-content: space-evenly; flex-wrap: wrap;">
   <img src="images/task-overview.png" alt="Task Overview" width="200" />
@@ -32,7 +34,71 @@ Features:
   <img src="images/task-manager-app-icon.png" alt="App Icon" width="200" />
 </div>
 
-## Deploy the app on IOS (native device)
+
+## **Getting Started**
+1. Install [Flutter](https://flutter.dev/docs/get-started/install).
+2. Set up your environment for [iOS](https://flutter.dev/docs/get-started/install/macos) or [Android](https://flutter.dev/docs/get-started/install/windows).
+3. Ensure you have access to the [backend](https://github.com/nufki/task-manager-backend) API.
+
+
+### **Installation**
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/nufki/task-manager-flutter.git
+   cd task-manager-flutter
+   ```
+2. Fetch dependencies:
+   ```bash
+   flutter pub get
+   ```
+3. Configure the backend API endpoints in the application (if necessary). You can also leave it as is as the default points to my running backend. ;-)
+  - Otherwise customize your endpoints in the `.env` when you deployed your version of the backend.
+
+
+### **Running the App**
+1. To run on a connected device or emulator:
+   ```bash
+   flutter run
+   ```
+2. To build for release:
+   ```bash
+   flutter build ios  # For iOS
+   flutter build apk  # For Android
+   ```
+
+
+## **Project Components**
+
+### **Backend**
+The app communicates with the backend API for task management operations. Check out the backend source code and documentation here: [Task Manager Backend](https://github.com/nufki/task-manager-backend).
+
+### **Web Frontend**
+A corresponding Angular web frontend is also available for this project. To explore or contribute to the web version, visit: [Task Manager Frontend](https://github.com/nufki/task-manager-frontend).
+
+---
+
+## **Contributing**
+
+Contributions are welcome! Please follow these steps:
+
+1. Fork the repository.
+2. Create a new branch for your feature or bugfix:
+   ```bash
+   git checkout -b feature-name
+   ```
+3. Commit your changes:
+   ```bash
+   git commit -m "Add a meaningful commit message"
+   ```
+4. Push to your branch:
+   ```bash
+   git push origin feature-name
+   ```
+5. Open a pull request.
+
+
+
+## Fastest way to deploy on IOS
 1. Initial setup: run: `open ios/Runner.xcworkspace`, set team (yourself probably)
 2. Then run this command below running the build above manually on xcode runs it in debug mode only
 ````

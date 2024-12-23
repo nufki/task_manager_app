@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http_interceptor/http/intercepted_http.dart';
 
 import '../auth/auth_interceptor.dart';
@@ -9,17 +10,16 @@ import 'auth_service.dart';
 class TaskService {
   late final InterceptedHttp _http;
   final AuthService _authService;
+  final String taskApi = dotenv.env['TASK_MANAGER_API'] ??
+      'https://je08p2822d.execute-api.eu-west-1.amazonaws.com/prod/tasks';
 
   TaskService(this._authService) {
     _http =
         InterceptedHttp.build(interceptors: [AuthInterceptor(_authService)]);
   }
 
-  final String apiUrl =
-      'https://je08p2822d.execute-api.eu-west-1.amazonaws.com/prod/tasks';
-
   Future<List<Task>> fetchAllTasks() async {
-    final response = await _http.get(Uri.parse(apiUrl));
+    final response = await _http.get(Uri.parse(taskApi));
     if (response.statusCode == 200) {
       List<dynamic> data = jsonDecode(response.body);
       return data.map((item) => _mapToTask(item)).toList();
@@ -30,7 +30,7 @@ class TaskService {
 
   Future<void> addTask(Task task) async {
     await _http.post(
-      Uri.parse(apiUrl),
+      Uri.parse(taskApi),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({
         'name': task.name,
@@ -45,7 +45,7 @@ class TaskService {
 
   Future<void> updateTask(Task task) async {
     await _http.put(
-      Uri.parse('$apiUrl/${task.id}'), // Include task ID in the endpoint
+      Uri.parse('$taskApi/${task.id}'), // Include task ID in the endpoint
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({
         'name': task.name,
@@ -60,7 +60,7 @@ class TaskService {
 
   Future<void> deleteTask(String taskId) async {
     await _http.delete(
-      Uri.parse('$apiUrl/$taskId'), // Include task ID in the endpoint
+      Uri.parse('$taskApi/$taskId'), // Include task ID in the endpoint
       headers: {'Content-Type': 'application/json'},
     );
   }
