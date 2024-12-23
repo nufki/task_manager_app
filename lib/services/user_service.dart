@@ -17,9 +17,17 @@ class UserService {
   final String apiUrl =
       'https://b3h6utkwz2.execute-api.eu-west-1.amazonaws.com/prod/users';
 
-  Future<List<String>> fetchUsers() async {
-    final response = await _http.get(Uri.parse(apiUrl));
-    print('Response Body: ${response.body}');
+  // Fetch users with search query, limit, and nextToken for pagination
+  Future<List<String>> fetchUsers(
+      {String query = '', int limit = 10, String? nextToken}) async {
+    print('fetch user called');
+    final response = await _http.get(
+      Uri.parse(apiUrl).replace(queryParameters: {
+        'username': query,
+        'limit': limit.toString(),
+        if (nextToken != null) 'nextToken': nextToken,
+      }),
+    );
 
     if (response.statusCode == 200) {
       // Decode the JSON response as a Map

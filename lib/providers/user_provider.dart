@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 
 import '../services/auth_service.dart';
 import '../services/user_service.dart';
@@ -17,19 +17,29 @@ class UserProvider with ChangeNotifier {
     _userService = UserService(_authService);
   }
 
-  /// Load all users from the backend
-  Future<void> loadUsers() async {
+  /// Load users from the backend with a query
+  Future<void> loadUsers({String query = ''}) async {
+    if (query.isEmpty || query.length < 2) {
+      return; // Don't trigger search if query is empty or less than 2
+    }
+
     _loading = true;
     notifyListeners();
 
     try {
-      _users = await _userService.fetchUsers();
+      _users =
+          await _userService.fetchUsers(query: query); // Fetch based on query
     } catch (error) {
-      // Handle errors, e.g., logging or showing a UI message
       print('Error loading users: $error');
     } finally {
       _loading = false;
       notifyListeners();
     }
+  }
+
+  /// Clear the users list
+  void clearUsers() {
+    _users.clear(); // Clear the users list
+    notifyListeners(); // Notify listeners to trigger UI update
   }
 }
