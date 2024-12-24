@@ -18,11 +18,19 @@ class TaskService {
         InterceptedHttp.build(interceptors: [AuthInterceptor(_authService)]);
   }
 
-  Future<List<Task>> fetchAllTasks() async {
-    final response = await _http.get(Uri.parse(taskApi));
+  Future<List<Task>> fetchAllTasks({int limit = 10, String? nextToken}) async {
+    final queryParams = <String, String>{'limit': limit.toString()};
+    if (nextToken != null) {
+      queryParams['paginationToken'] = nextToken;
+    }
+
+    final uri = Uri.parse(taskApi).replace(queryParameters: queryParams);
+    final response = await _http.get(uri);
+
     if (response.statusCode == 200) {
-      List<dynamic> data = jsonDecode(response.body);
-      return data.map((item) => _mapToTask(item)).toList();
+      final Map<String, dynamic> data = jsonDecode(response.body);
+      final List<dynamic> items = data['items'];
+      return items.map((item) => _mapToTask(item)).toList();
     } else {
       throw Exception('Failed to load tasks');
     }
