@@ -7,6 +7,13 @@ import '../auth/auth_interceptor.dart';
 import '../models/task.dart';
 import 'auth_service.dart';
 
+class PaginatedTasks {
+  final List<Task> tasks;
+  final String? nextToken;
+
+  PaginatedTasks({required this.tasks, this.nextToken});
+}
+
 class TaskService {
   late final InterceptedHttp _http;
   final AuthService _authService;
@@ -18,10 +25,10 @@ class TaskService {
         InterceptedHttp.build(interceptors: [AuthInterceptor(_authService)]);
   }
 
-  Future<List<Task>> fetchAllTasks({int limit = 10, String? nextToken}) async {
-    final queryParams = <String, String>{'limit': limit.toString()};
+  Future<PaginatedTasks> fetchTasks({int limit = 10, String? nextToken}) async {
+    final queryParams = {'limit': limit.toString()};
     if (nextToken != null) {
-      queryParams['paginationToken'] = nextToken;
+      queryParams['nextToken'] = nextToken;
     }
 
     final uri = Uri.parse(taskApi).replace(queryParameters: queryParams);
@@ -30,30 +37,20 @@ class TaskService {
     if (response.statusCode == 200) {
       final Map<String, dynamic> data = jsonDecode(response.body);
       final List<dynamic> items = data['items'];
-      return items.map((item) => _mapToTask(item)).toList();
+      final String? newNextToken = data['nextToken'];
+
+      return PaginatedTasks(
+        tasks: items.map((item) => _mapToTask(item)).toList(),
+        nextToken: newNextToken,
+      );
     } else {
       throw Exception('Failed to load tasks');
     }
   }
 
-  Future<void> addTask(Task task) async {
-    await _http.post(
+  Future<Task> addTask(Task task) async {
+    final response = await _http.post(
       Uri.parse(taskApi),
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({
-        'name': task.name,
-        'description': task.description,
-        'status': task.status.toJson(), // Use toJson() from the extension
-        'priority': task.priority.toJson(), // Use toJson() from the extension
-        'dueDate': task.dueDate.toIso8601String(),
-        'assignedUser': task.assignedUser,
-      }),
-    );
-  }
-
-  Future<void> updateTask(Task task) async {
-    await _http.put(
-      Uri.parse('$taskApi/${task.id}'), // Include task ID in the endpoint
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({
         'name': task.name,
@@ -64,6 +61,35 @@ class TaskService {
         'assignedUser': task.assignedUser,
       }),
     );
+
+    if (response.statusCode == 201) {
+      final Map<String, dynamic> data = jsonDecode(response.body);
+      return _mapToTask(data); // Convert the response to a Task object
+    } else {
+      throw Exception('Failed to add task');
+    }
+  }
+
+  Future<Task> updateTask(Task task) async {
+    final response = await _http.put(
+      Uri.parse('$taskApi/${task.id}'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'name': task.name,
+        'description': task.description,
+        'status': task.status.toJson(),
+        'priority': task.priority.toJson(),
+        'dueDate': task.dueDate.toIso8601String(),
+        'assignedUser': task.assignedUser,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> data = jsonDecode(response.body);
+      return _mapToTask(data); // Convert the response to a Task object
+    } else {
+      throw Exception('Failed to update task');
+    }
   }
 
   Future<void> deleteTask(String taskId) async {

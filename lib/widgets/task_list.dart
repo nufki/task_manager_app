@@ -1,149 +1,74 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:task_manager_app/models/task.dart';
+import 'package:task_manager_app/widgets/task-card.dart';
 import 'package:task_manager_app/widgets/task_details_form.dart';
 import 'package:task_manager_app/widgets/task_helpers.dart';
 
+import '../models/task.dart';
 import '../providers/task_provider.dart';
 
-class TaskList extends StatelessWidget {
+class TaskList extends StatefulWidget {
   const TaskList({super.key});
+
+  @override
+  State<TaskList> createState() => _TaskListState();
+}
+
+class _TaskListState extends State<TaskList> {
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(() {
+      if (_scrollController.position.pixels ==
+          _scrollController.position.maxScrollExtent) {
+        final taskProvider = Provider.of<TaskProvider>(context, listen: false);
+        taskProvider.loadMoreTasks();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     final taskProvider = Provider.of<TaskProvider>(context);
 
     return ListView.builder(
-      itemCount: taskProvider.tasks.length,
+      controller: _scrollController,
+      itemCount: taskProvider.tasks.length + 1, // Add 1 for the footer widget
       itemBuilder: (context, index) {
-        final task = taskProvider.tasks[index];
-        final now = DateTime.now();
-        final isPastDue = task.dueDate.isBefore(now);
-        final isUnassigned =
-            task.assignedUser == null || task.assignedUser!.isEmpty;
-
-        return Card(
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      task.name,
-                      style: const TextStyle(
-                          fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
-                    // 3-dot menu
-                    PopupMenuButton<String>(
-                      onSelected: (value) {
-                        if (value == 'view_details') {
-                          _showTaskDetails(context, task);
-                        }
-                        if (value == 'delete_task') {
-                          _deleteTask(context, task);
-                        }
-                      },
-                      itemBuilder: (BuildContext context) {
-                        return [
-                          const PopupMenuItem<String>(
-                            value: 'view_details',
-                            child: Text('Details'),
-                          ),
-                          const PopupMenuItem<String>(
-                            value: 'delete_task',
-                            child: Text('Delete'),
-                          ),
-                        ];
-                      },
-                      icon: const Icon(Icons.more_vert),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                Text.rich(
-                  TextSpan(
-                    children: [
-                      const TextSpan(
-                        text: 'Due Date: ',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      TextSpan(
-                        text: _formatDate(task.dueDate),
-                        style: TextStyle(
-                            color: isPastDue ? Colors.red : Colors.black),
-                      ),
-                    ],
-                  ),
-                ),
-                Text.rich(
-                  TextSpan(
-                    children: [
-                      const TextSpan(
-                        text: 'Priority: ',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      TextSpan(text: task.priority.displayName),
-                    ],
-                  ),
-                ),
-                Text.rich(
-                  TextSpan(
-                    children: [
-                      const TextSpan(
-                        text: 'Status: ',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      TextSpan(text: task.status.displayName),
-                    ],
-                  ),
-                ),
-                Text.rich(
-                  TextSpan(
-                    children: [
-                      const TextSpan(
-                        text: 'Assigned: ',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      TextSpan(
-                        text: isUnassigned ? 'Unassigned' : task.assignedUser!,
-                        style: TextStyle(
-                            color: isUnassigned ? Colors.red : Colors.black),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 12),
-              ],
-            ),
-          ),
-        );
+        if (index < taskProvider.tasks.length) {
+          final task = taskProvider.tasks[index];
+          return TaskCard(
+            task: task,
+            onViewDetails: (task) => _showTaskDetails(context, task),
+            onDelete: (task) => _deleteTask(context, task),
+          );
+        } else {
+          // Footer widget: loading indicator or "No more tasks" message
+          if (taskProvider.isLoadingMore) {
+            return const Padding(
+              padding: EdgeInsets.all(16),
+              child: Center(child: CircularProgressIndicator()),
+            );
+          } else if (!taskProvider.hasMore) {
+            return const Padding(
+              padding: EdgeInsets.all(16),
+              child: Center(child: Text('No more tasks to load.')),
+            );
+          } else {
+            return const SizedBox
+                .shrink(); // Empty widget when neither loading nor end
+          }
+        }
       },
     );
-  }
-
-  String _formatDate(DateTime date) {
-    return '${_monthAbbreviation(date.month)} ${date.day}, ${date.year}';
-  }
-
-  String _monthAbbreviation(int month) {
-    const months = [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec'
-    ];
-    return months[month - 1];
   }
 
   void _showTaskDetails(BuildContext context, Task task) {
