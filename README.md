@@ -23,7 +23,7 @@ managing task and is only meant for demo purposes. The app integrates with a bac
 - **Frontend (Web)**: [Angular Frontend](https://github.com/nufki/task-manager-frontend) (version 18.2).
 
 
-## Impressions
+## Impressions (maybe outdated)
 <div style="display: flex; justify-content: space-evenly; flex-wrap: wrap;">
   <img src="images/task-overview.png" alt="Task Overview" width="200" />
   <img src="images/sort-tasks.png" alt="Sort Tasks" width="200" />
